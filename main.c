@@ -15,9 +15,17 @@ void print_flag() {
 }
 
 int main(int argc, char *argv[]) {
+    window_t *window = new_window(WIDTH, HEIGHT);
+    if(window == NULL) {
+        return EXIT_FAILURE;
+    }
+
     if(argc != 2) {
         return EXIT_FAILURE;
     }
+
+    
+    window_clear(window);
     
     chip8_t *chip8 = new_chip8();
     if(!load_data(chip8, argv[1])) {
@@ -26,6 +34,9 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     for(;;) {
+        if(window->quit_flag) {
+            break;
+        }
         if(!chip8_cycle(chip8)) {
             print_flag();
             printf("\nAn error occurred while processing input, is the data format correct\n");
@@ -37,13 +48,11 @@ int main(int argc, char *argv[]) {
             free_chip8(chip8);
             return EXIT_FAILURE;
         }
-        if(chip8->draw_flag) {
-            // draw here
-            chip8->draw_flag = FALSE;
-        }
+        //draw_chip8(window, chip8);
     }
 
     free_chip8(chip8);
+    free_window(window);
     return EXIT_SUCCESS;
 }
 

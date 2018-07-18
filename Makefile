@@ -1,9 +1,9 @@
 CC     = gcc
-CFLAGS = -std=c99 -lm
+CFLAGS = -lmingw32 -lSDL2main -lSDL2 -std=c99 -lm
 # modify the flags here ^
 
 EXE    = chip8
-OBJ    = main.o chip8.o file.o cycle.o
+OBJ    = main.o chip8.o file.o cycle.o graphics.o
 
 
 # top (default) target
@@ -24,6 +24,7 @@ main.o: chip8.h
 chip8.o: chip8.h
 file.o: file.h chip8.h
 cycle.o: chip8.h cycle.h
+graphics.o: chip8.h graphics.h
 
 
 

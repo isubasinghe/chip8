@@ -12,5 +12,6 @@
 #include "chip8.h"
 #include "file.h"
 #include "cycle.h"
+#include "graphics.h"
 
 #endif // ALL_H
