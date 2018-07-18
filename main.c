@@ -1,12 +1,9 @@
 
-#ifdef WEB
-#include <emscripten.h>
-#endif // WEB
+#define WIDTH 640
+#define HEIGHT 320
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <SDL2/SDL.h>
 
 #include "all.h"
 
@@ -18,19 +15,16 @@ void print_flag() {
 }
 
 int main(int argc, char *argv[]) {
-
-    #ifndef WEB
     if(argc != 2) {
         return EXIT_FAILURE;
     }
-
+    
     chip8_t *chip8 = new_chip8();
     if(!load_data(chip8, argv[1])) {
-        printf("Unable to load\n");
+
         free_chip8(chip8);
         return EXIT_FAILURE;
     }
-
     for(;;) {
         if(!chip8_cycle(chip8)) {
             print_flag();
@@ -39,13 +33,17 @@ int main(int argc, char *argv[]) {
             printf("The opcode read was not recognised to be part of the chip8 instruction set\n");
             printf("This could be a bug in this program's code as well\n\n");
             print_flag();
+
             free_chip8(chip8);
             return EXIT_FAILURE;
         }
+        if(chip8->draw_flag) {
+            // draw here
+            chip8->draw_flag = FALSE;
+        }
     }
-    free_chip8(chip8);
-    #endif // WEB
 
-    
-    return 0;
+    free_chip8(chip8);
+    return EXIT_SUCCESS;
 }
+

@@ -15,14 +15,9 @@ debug: $(EXE)
 release: CFLAGS += -O3
 release: $(EXE)
 
-web: CC = emcc
-web: CFLAGS += -O3 -DWEB -s USE_SDL=2
-web: EXE = chip8.html
-web: $(EXE)
-
 # how to link executable
 $(EXE): $(OBJ)
-	$(CC) $(CFLAGS) -o $(EXE) $(OBJ)
+	$(CC) $(OBJ) -o $(EXE) $(CFLAGS)
 
 # other dependencies
 main.o: chip8.h
