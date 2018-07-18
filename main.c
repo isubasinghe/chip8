@@ -1,7 +1,12 @@
 
+#ifdef WEB
+#include <emscripten.h>
+#endif // WEB
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <SDL2/SDL.h>
 
 #include "all.h"
 
@@ -13,6 +18,8 @@ void print_flag() {
 }
 
 int main(int argc, char *argv[]) {
+
+    #ifndef WEB
     if(argc != 2) {
         return EXIT_FAILURE;
     }
@@ -36,7 +43,9 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
     }
-
     free_chip8(chip8);
+    #endif // WEB
+
+    
     return 0;
 }
