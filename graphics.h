@@ -14,6 +14,8 @@ typedef struct {
     SDL_Renderer *renderer;
     SDL_Window *window;
     char quit_flag;
+    int width;
+    int height;
 } window_t;
 
 window_t *new_window(int, int);

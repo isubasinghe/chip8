@@ -2,8 +2,15 @@
 #define WIDTH 640
 #define HEIGHT 320
 
+#define FPS 5
+#define FPS_MICRO (FPS*1000/60)
+
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef WEB
+#include <emscripten.h>
+#endif // WEB
 
 #include "all.h"
 
@@ -14,45 +21,113 @@ void print_flag() {
     putc('\n', stdout);
 }
 
-int main(int argc, char *argv[]) {
-    window_t *window = new_window(WIDTH, HEIGHT);
-    if(window == NULL) {
-        return EXIT_FAILURE;
+typedef struct {
+    window_t *win;
+    chip8_t *chip8;
+} context_t;
+
+void loop_fn(void *arg) {
+    context_t *ctx = (context_t *)arg;
+    window_t *win = ctx->win;
+    chip8_t *chip8 = ctx->chip8;
+
+    if(!chip8_cycle(chip8)) {
+        print_flag();
+        printf("\nAn error occurred while processing input, is the data format correct\n");
+        printf("\n\n");
+        printf("The opcode read was not recognised to be part of the chip8 instruction set\n");
+        printf("This could be a bug in this program's code as well\n\n");
+        print_flag();
+        win->quit_flag = TRUE;
+        return;
     }
 
+    printf("Called\n");
+
+    draw_chip8(win, chip8);
+
+}
+
+int main(int argc, char *argv[]) {
+    #ifdef WEB
+    window_t *window = new_window(WIDTH, HEIGHT);
+    if(window == NULL) {
+        printf("Unable to create window\n");
+        return EXIT_FAILURE;
+    }
+    
+    
+    /*
     if(argc != 2) {
         return EXIT_FAILURE;
     }
+    */
 
     
     window_clear(window);
     
     chip8_t *chip8 = new_chip8();
-    if(!load_data(chip8, argv[1])) {
-
+    if(!load_data(chip8, "roms/blinky.c8")) {
+        printf("Unable to load data\n");
         free_chip8(chip8);
         return EXIT_FAILURE;
     }
+
+    context_t ctx;
+    ctx.win = window;
+    ctx.chip8 = chip8;
+    emscripten_set_main_loop_arg(loop_fn, &ctx, -1, 1);
+
+    free_chip8(chip8);
+    free_window(window);
+
+    return EXIT_SUCCESS;
+
+    #else
+
+    window_t *window = new_window(WIDTH, HEIGHT);
+    if(window == NULL) {
+        printf("Unable to create window\n");
+        return EXIT_FAILURE;
+    }
+    
+    if(argc != 2) {
+        return EXIT_FAILURE;
+    }
+    
+    window_clear(window);
+    
+    chip8_t *chip8 = new_chip8();
+    if(!load_data(chip8, argv[1])) {
+        printf("Unable to load data\n");
+        free_chip8(chip8);
+        return EXIT_FAILURE;
+    }
+
+    context_t ctx;
+    ctx.win = window;
+    ctx.chip8 = chip8;
+
+
     for(;;) {
-        if(window->quit_flag) {
+
+        SDL_Event event;
+        memset(&event, 0, sizeof(event));
+        SDL_PollEvent(&event);
+        if(event.type == SDL_QUIT) {
+            window->quit_flag = TRUE;
             break;
         }
-        if(!chip8_cycle(chip8)) {
-            print_flag();
-            printf("\nAn error occurred while processing input, is the data format correct\n");
-            printf("\n\n");
-            printf("The opcode read was not recognised to be part of the chip8 instruction set\n");
-            printf("This could be a bug in this program's code as well\n\n");
-            print_flag();
+        chip8_cycle(chip8);
 
-            free_chip8(chip8);
-            return EXIT_FAILURE;
-        }
-        //draw_chip8(window, chip8);
+        draw_chip8(window, chip8);
     }
 
     free_chip8(chip8);
     free_window(window);
+
     return EXIT_SUCCESS;
+
+    #endif //WEB
 }
 

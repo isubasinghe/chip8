@@ -1,19 +1,25 @@
 CC     = gcc
-CFLAGS = -lmingw32 -lSDL2main -lSDL2 -std=c99 -lm
+CFLAGS = -std=c99
 # modify the flags here ^
 
 EXE    = chip8
 OBJ    = main.o chip8.o file.o cycle.o graphics.o
 
 
-# top (default) target
-all: $(EXE)
 
-debug: CFLAGS += -DDEBUG -g
+debug: CFLAGS += -lSDL2main -lSDL2 -DDEBUG -g -lm
 debug: $(EXE)
 
-release: CFLAGS += -O3
+release: CFLAGS += -lSDL2main -lSDL2 -O3 -lm
 release: $(EXE)
+
+mingw-release: CFLAGS += -lmingw32 -lSDL2main -lSDL2 -std=c99 -lm
+mingw-release: $(EXE)
+
+web: CC = emcc
+web: CFLAGS += --preload-file roms -s USE_SDL=2 -DWEB
+web: EXE = chip8.html
+web: $(EXE)
 
 # how to link executable
 $(EXE): $(OBJ)
@@ -29,10 +35,14 @@ graphics.o: chip8.h graphics.h
 
 
 # phony targets (these targets do not represent actual files)
-.PHONY: clean cleanwin
+.PHONY: clean cleanwin cleanweb
 
 clean:
 	rm -f $(OBJ)
 
 cleanwin: 
 	del $(OBJ)
+
+cleanweb:
+	rm -f $(OBJ)
+	rm *.wasm *.js *.html
