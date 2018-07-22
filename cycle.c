@@ -183,6 +183,7 @@ char chip8_cycle(chip8_t *chip8) {
                     }else {
                         chip8->pc += 2;
                     }
+                    chip8->key[chip8->V[(chip8->opcode & 0x0F00) >> 8]];
                 break;
                             
                 case 0x0001: // EXA1: Skips the next instruction if the key stored in VX isn't pressed
@@ -191,6 +192,7 @@ char chip8_cycle(chip8_t *chip8) {
                     }else {
                         chip8->pc += 2;
                     }
+                    chip8->key[chip8->V[(chip8->opcode & 0x0F00) >> 8]] = FALSE;
                 break;
 
                 default: printf("Wrong opcode: %X\n", chip8->opcode); getchar();
@@ -211,6 +213,7 @@ char chip8_cycle(chip8_t *chip8) {
                         if(chip8->key[i]) {
                             chip8->V[(chip8->opcode & 0x0F00) >> 8] = i;
                             chip8->pc += 2;
+                            chip8->key[i] = FALSE;
                         }
                     }
                    
@@ -270,7 +273,7 @@ char chip8_cycle(chip8_t *chip8) {
     }
     if(chip8->sound_timer > 0) {
         if(chip8->sound_timer == 1) {
-            printf("\a");
+            //printf("\a");
         }
         chip8->sound_timer--;
     }

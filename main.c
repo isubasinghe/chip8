@@ -2,6 +2,7 @@
 #define WIDTH 640
 #define HEIGHT 320
 
+
 #define FPS 5
 #define FPS_MICRO (FPS*1000/60)
 
@@ -13,6 +14,25 @@
 #endif // WEB
 
 #include "all.h"
+
+static unsigned char keymap[KEY_SIZE] = {
+    SDLK_1,
+    SDLK_2,
+    SDLK_3,
+    SDLK_w, // up
+    SDLK_q,
+    SDLK_4,
+    SDLK_s, // down
+    SDLK_a, // left
+    SDLK_d, //right
+    SDLK_v,
+    SDLK_e,
+    SDLK_f,
+    SDLK_z,
+    SDLK_x,
+    SDLK_c,
+    SDLK_r
+};
 
 void print_flag() {
     for(int i=0; i < 80; i++) {
@@ -108,6 +128,7 @@ int main(int argc, char *argv[]) {
     ctx.win = window;
     ctx.chip8 = chip8;
 
+    char pause = FALSE;
 
     for(;;) {
 
@@ -117,10 +138,23 @@ int main(int argc, char *argv[]) {
         if(event.type == SDL_QUIT) {
             window->quit_flag = TRUE;
             break;
+        }else if(event.type == SDL_KEYDOWN) {
+            if(event.key.keysym.sym == SDLK_p) {
+                pause = !pause;
+            }else {
+                for(short i=0; i < KEY_SIZE; i++) {
+                    if(keymap[i] == event.key.keysym.sym) {
+                        chip8->key[i] = TRUE;
+                        break;
+                    }
+                }
+            }
         }
+        if(pause) {continue;}
         chip8_cycle(chip8);
 
         draw_chip8(window, chip8);
+        
     }
 
     free_chip8(chip8);

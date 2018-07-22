@@ -13,8 +13,11 @@ debug: $(EXE)
 release: CFLAGS += -lSDL2main -lSDL2 -O3 -lm
 release: $(EXE)
 
-mingw-release: CFLAGS += -lmingw32 -lSDL2main -lSDL2 -std=c99 -lm
+mingw-release: CFLAGS += -O3 -lmingw32 -lSDL2main -lSDL2 -std=c99 -lm
 mingw-release: $(EXE)
+
+mingw-debug: CFLAGS += -g -DDEBUG -lmingw32 -lSDL2main -lSDL2 -std=c99 -lm
+mingw-debug: $(EXE)
 
 web: CC = emcc
 web: CFLAGS += --preload-file roms -s USE_SDL=2 -DWEB

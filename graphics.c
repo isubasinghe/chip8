@@ -34,7 +34,6 @@ void draw_chip8(window_t *win, chip8_t *chip8) {
     
 
     if(chip8->draw_flag) {
-        SDL_Delay(5);
         SDL_SetRenderDrawColor(win->renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(win->renderer);
 
