@@ -42,7 +42,6 @@ typedef struct {
     unsigned char key[KEY_SIZE];
 
     unsigned char draw_flag;
-
 } chip8_t;
 
 
